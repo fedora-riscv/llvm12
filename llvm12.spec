@@ -48,7 +48,7 @@
 
 Name:		%{pkg_name}
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}%{?rc_ver:~rc%{rc_ver}}
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	The Low Level Virtual Machine
 
 License:	NCSA
@@ -64,6 +64,9 @@ Source4:	lit.fedora.cfg.py
 
 Patch0:     0001-PATCH-llvm-Make-source-interleave-prefix-test-case-c.patch
 
+# RHEL-specific patches
+Patch101:	0001-Deactivate-markdown-doc.patch
+
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
 BuildRequires:	cmake
@@ -73,7 +76,9 @@ BuildRequires:	libffi-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	python3-psutil
 BuildRequires:	python3-sphinx
+%if %{defined fedora}
 BuildRequires:	python3-recommonmark
+%endif
 BuildRequires:	multilib-rpm-config
 %if %{with gold}
 BuildRequires:	binutils-devel
@@ -175,7 +180,11 @@ LLVM's modified googletest sources.
 
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%autosetup -n %{llvm_srcdir} -p2
+%setup -q -n %{llvm_srcdir}
+%patch0 -p2
+%if %{undefined fedora}
+%patch101 -p2
+%endif
 
 pathfix.py -i %{__python3} -pn \
 	test/BugPoint/compile-custom.ll.py \
@@ -499,6 +508,9 @@ fi
 %endif
 
 %changelog
+* Mon Sep  5 2022 Jens Petersen <petersen@redhat.com> - 12.0.1-6
+- python3-recommonmark is only in Fedora
+
 * Thu Jul 21 2022 Fedora Release Engineering <releng@fedoraproject.org> - 12.0.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_37_Mass_Rebuild
 
