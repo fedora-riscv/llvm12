@@ -64,8 +64,9 @@ Source4:	lit.fedora.cfg.py
 
 Patch0:     0001-PATCH-llvm-Make-source-interleave-prefix-test-case-c.patch
 
-# RHEL-specific patches
+%if %{defined rhel}
 Patch101:	0001-Deactivate-markdown-doc.patch
+%endif
 
 BuildRequires:	gcc
 BuildRequires:	gcc-c++
@@ -180,11 +181,7 @@ LLVM's modified googletest sources.
 
 %prep
 %{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
-%setup -q -n %{llvm_srcdir}
-%patch0 -p2
-%if %{undefined fedora}
-%patch101 -p2
-%endif
+%autosetup -n %{llvm_srcdir} -p2
 
 pathfix.py -i %{__python3} -pn \
 	test/BugPoint/compile-custom.ll.py \
