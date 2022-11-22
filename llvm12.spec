@@ -393,6 +393,13 @@ touch %{buildroot}%{_bindir}/llvm-config%{exec_suffix}
 rm test/tools/llvm-readobj/ELF/dependent-libraries.test
 %endif
 
+%if %{defined el9}
+%ifarch s390x
+rm test/tools/llvm-objcopy/ELF/compress-debug-sections-zlib-gnu.test
+rm test/tools/llvm-objcopy/ELF/compress-debug-sections-zlib.test
+%endif
+%endif
+
 # non reproducible errors
 rm test/tools/dsymutil/X86/swift-interface.test
 
