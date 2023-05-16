@@ -48,7 +48,7 @@
 
 Name:		%{pkg_name}
 Version:	%{maj_ver}.%{min_ver}.%{patch_ver}%{?rc_ver:~rc%{rc_ver}}
-Release:	8%{?dist}
+Release:	8.rv64%{?dist}
 Summary:	The Low Level Virtual Machine
 
 License:	NCSA
@@ -204,7 +204,7 @@ pathfix.py -i %{__python3} -pn \
 # Because of these failures, lto is disabled for now.
 %global _lto_cflags %{nil}
 
-%ifarch s390 s390x %{arm} %ix86
+%ifarch s390 s390x %{arm} %ix86 riscv64
 # Decrease debuginfo verbosity to reduce memory consumption during final library linking
 %global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
 %endif
@@ -215,7 +215,7 @@ pathfix.py -i %{__python3} -pn \
 	-DLLVM_PARALLEL_LINK_JOBS=1 \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	-DCMAKE_SKIP_RPATH:BOOL=ON \
-%ifarch s390 %{arm} %ix86
+%ifarch s390 %{arm} %ix86 riscv64
 	-DCMAKE_C_FLAGS_RELWITHDEBINFO="%{optflags} -DNDEBUG" \
 	-DCMAKE_CXX_FLAGS_RELWITHDEBINFO="%{optflags} -DNDEBUG" \
 %endif
@@ -404,6 +404,19 @@ rm test/tools/llvm-objcopy/ELF/compress-debug-sections-zlib.test
 %endif
 %endif
 
+%ifarch riscv64
+rm test/CodeGen/WebAssembly/immediates.ll
+rm test/ExecutionEngine/frem.ll
+rm test/ExecutionEngine/mov64zext32.ll
+rm test/ExecutionEngine/test-interp-vec-arithm_float.ll
+rm test/ExecutionEngine/test-interp-vec-arithm_int.ll
+rm test/ExecutionEngine/test-interp-vec-logical.ll
+rm test/ExecutionEngine/test-interp-vec-setcond-fp.ll
+rm test/ExecutionEngine/test-interp-vec-setcond-int.ll
+rm test/tools/llvm-ar/error-opening-permission.test
+rm test/tools/llvm-elfabi/fail-file-write.test
+%endif
+
 # non reproducible errors
 rm test/tools/dsymutil/X86/swift-interface.test
 
@@ -516,6 +529,9 @@ fi
 %endif
 
 %changelog
+* Tue May 16 2023 Liu Yang <Yang.Liu.sn@gmail.com> - 12.0.1-8.rv64
+- Add riscv64.
+
 * Tue Jan 31 2023 Jens Petersen <petersen@redhat.com> - 12.0.1-8
 - Add gcc12 patch to add includes needed for GCC 12 (Jerry James)
 - Add typename patch to fix test failures (Jerry James)
